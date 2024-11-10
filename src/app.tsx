@@ -2,6 +2,7 @@ import {type Component, createSignal, onCleanup} from 'solid-js'
 import Background from './components/background/background.tsx'
 import SidePanel from './components/side-panel/side-panel.tsx'
 import {SettingsProvider} from './config/settings-context.tsx'
+import WeatherWidget from './widgets/weather/weather.tsx'
 
 const App: Component = () => {
   const [time, setTime] = createSignal(Date.now())
@@ -31,6 +32,7 @@ const App: Component = () => {
       >
         <b>{formatter.format(time())}</b>
       </div>
+      <WeatherWidget />
     </SettingsProvider>
   )
 }
