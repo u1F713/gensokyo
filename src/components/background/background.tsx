@@ -1,41 +1,37 @@
-import {Effect, pipe} from 'effect'
-import {type Component, Show, createEffect, onMount} from 'solid-js'
+import {Effect, ManagedRuntime, pipe} from 'effect'
+import {type Component, Show, createEffect, onCleanup, onMount} from 'solid-js'
 import {useSettings} from '~/config/settings-context.tsx'
+import {FileSystemContext} from '~/lib/file-system/FileSystemContext.ts'
 import * as styles from './background.css.ts'
 
 const Background: Component = () => {
   const [settings, {setBackground}] = useSettings()
+  const runtime = ManagedRuntime.make(FileSystemContext.Live)
 
-  const getFileHandle = pipe(
-    Effect.promise(() => navigator.storage.getDirectory()),
-    Effect.flatMap((h) =>
-      Effect.promise(() => h.getFileHandle('background', {create: true})),
-    ),
-  )
-
-  onMount(async () => {
-    const loadBackground = pipe(
-      getFileHandle,
-      Effect.flatMap((f) => Effect.promise(() => f.getFile())),
-      Effect.map(setBackground),
+  onMount(() => {
+    runtime.runPromise(
+      pipe(
+        Effect.map(FileSystemContext, (_) => _.readFile),
+        Effect.flatMap((r) => r('background')),
+        Effect.map(setBackground),
+      ),
     )
-
-    Effect.runPromise(loadBackground)
   })
 
   createEffect(() => {
     const {background} = settings
+    if (background === undefined) return
 
-    if (background !== undefined) {
-      const saveBackground = Effect.gen(function* () {
-        const h = yield* getFileHandle
-        const w = yield* Effect.promise(() => h.createWritable())
-        yield* Effect.promise(() => w.write(background))
-        yield* Effect.promise(() => w.close())
-      })
+    runtime.runPromise(
+      pipe(
+        Effect.map(FileSystemContext, (_) => _.writeFile),
+        Effect.flatMap((w) => w('background', background)),
+      ),
+    )
+  })
 
-      Effect.runPromise(saveBackground)
-    }
+  onCleanup(() => {
+    runtime.dispose()
   })
 
   return (
