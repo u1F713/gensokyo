@@ -12,9 +12,6 @@ importers:
         specifier: ^1.9.3
         version: 1.9.3
     devDependencies:
-      '@effect/schema':
-        specifier: ^0.75.5
-        version: 0.75.5(effect@3.10.13)
       '@effect/vitest':
         specifier: ^0.13.13
         version: 0.13.13(effect@3.10.13)(vitest@2.1.4(@types/node@22.9.0)(jsdom@25.0.1))
@@ -153,11 +150,6 @@ packages:
   '@babel/types@7.26.0':
     resolution: {integrity: sha512-Z/yiTPj+lDVnF7lWeKCIJzaIkI0vYO87dMpZ4bg4TDrFe4XXLFWL1TbXU27gBP3QccxV9mZICCrnjnYlJjXHOA==}
     engines: {node: '>=6.9.0'}
-
-  '@effect/schema@0.75.5':
-    resolution: {integrity: sha512-TQInulTVCuF+9EIbJpyLP6dvxbQJMphrnRqgexm/Ze39rSjfhJuufF7XvU3SxTgg3HnL7B/kpORTJbHhlE6thw==}
-    peerDependencies:
-      effect: ^3.9.2
 
   '@effect/vitest@0.13.13':
     resolution: {integrity: sha512-x3r5WYmGYLylZmHZ0XnborADHVCyQNNNTtflv2MBoL7bPLDSqBzv7zDgU0jDnyz40KN+gYo6DNQXmPedJaj1gg==}
@@ -1494,11 +1486,6 @@ snapshots:
     dependencies:
       '@babel/helper-string-parser': 7.25.9
       '@babel/helper-validator-identifier': 7.25.9
-
-  '@effect/schema@0.75.5(effect@3.10.13)':
-    dependencies:
-      effect: 3.10.13
-      fast-check: 3.23.1
 
   '@effect/vitest@0.13.13(effect@3.10.13)(vitest@2.1.4(@types/node@22.9.0)(jsdom@25.0.1))':
     dependencies:

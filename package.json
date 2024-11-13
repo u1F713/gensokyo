@@ -12,7 +12,6 @@
     "solid-js": "^1.9.3"
   },
   "devDependencies": {
-    "@effect/schema": "^0.75.5",
     "@effect/vitest": "^0.13.13",
     "@solidjs/testing-library": "^0.8.10",
     "@testing-library/jest-dom": "^6.6.3",
