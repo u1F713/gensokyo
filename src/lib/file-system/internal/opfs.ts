@@ -1,39 +1,37 @@
 import {Effect, Stream, pipe} from 'effect'
 
-export const makeDirectory = (dirname: string) =>
-  Effect.gen(function* () {
-    const root = yield* Effect.promise(() => navigator.storage.getDirectory())
-    const path = dirname.split('/').filter((_) => _ !== '')
-
-    return yield* Stream.make(...path).pipe(
-      Stream.runFoldEffect(root, (s, a) =>
-        Effect.promise(() => s.getDirectoryHandle(a, {create: true})),
+export const getDirectoryHandle =
+  (path: string, options?: {create: boolean}) =>
+  (root: FileSystemDirectoryHandle) =>
+    pipe(
+      Stream.fromIterable(path.match(/[^\/]+/g) ?? []),
+      Stream.runFoldEffect(root, (parent, path) =>
+        Effect.promise(() => parent.getDirectoryHandle(path, options)),
       ),
     )
-  })
 
-const getFileHandle = (filename: string) =>
-  Effect.gen(function* () {
-    const lastSlash = filename.lastIndexOf('/')
-    const directory = yield* makeDirectory(filename.substring(0, lastSlash))
+export const getFileHandle =
+  (path: string, options?: {create: boolean}) =>
+  (parent: FileSystemDirectoryHandle) => {
+    const lastIndex = path.lastIndexOf('/')
 
-    return yield* Effect.promise(() =>
-      directory.getFileHandle(filename.substring(lastSlash + 1), {
-        create: true,
-      }),
+    const getHandle = (path: string) => (parent: FileSystemDirectoryHandle) =>
+      Effect.promise(() => parent.getFileHandle(path, options))
+
+    return Effect.flatMap(
+      getDirectoryHandle(path.substring(0, lastIndex))(parent),
+      getHandle(path.substring(lastIndex + 1)),
     )
-  })
+  }
 
-export const writeFile = (filename: string, file: File) =>
-  pipe(
-    getFileHandle(filename),
-    Effect.map((f) => Effect.promise(() => f.createWritable())),
-    Effect.flatMap(Effect.tap((w) => w.write(file))),
-    Effect.flatMap((w) => Effect.promise(() => w.close())),
-  )
+export const opfsFile = {
+  getFile: (file: FileSystemFileHandle) =>
+    Effect.promise(() => file.getFile()),
 
-export const readFile = (filename: string) =>
-  pipe(
-    getFileHandle(filename),
-    Effect.flatMap((f) => Effect.promise(() => f.getFile())),
-  )
+  writeFile: (file: File) => (handle: FileSystemFileHandle) =>
+    pipe(
+      Effect.promise(() => handle.createWritable()),
+      Effect.tap((w) => Effect.promise(() => w.write(file))),
+      Effect.flatMap((w) => Effect.promise(() => w.close())),
+    ),
+}
