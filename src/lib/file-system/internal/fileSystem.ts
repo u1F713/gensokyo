@@ -1,14 +1,9 @@
-import {Effect, Stream, pipe} from 'effect'
+import {Effect} from 'effect'
 import {getDirectoryHandle, getFileHandle, opfsFile} from './opfs.ts'
 
 export const makeDirectory =
   (root: FileSystemDirectoryHandle) => (path: string) =>
-    pipe(
-      Stream.fromIterable(path.match(/[^\/]+/g) ?? []),
-      Stream.runFoldEffect(root, (parent, path) =>
-        getDirectoryHandle(path, {create: true})(parent),
-      ),
-    )
+    getDirectoryHandle(path, {create: true})(root)
 
 export const getFileFactory =
   (root: FileSystemDirectoryHandle) => (path: string) =>
