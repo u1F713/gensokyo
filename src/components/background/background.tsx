@@ -1,4 +1,4 @@
-import {Effect, Layer, ManagedRuntime, pipe} from 'effect'
+import {Effect, ManagedRuntime, pipe} from 'effect'
 import {type Component, Show, createEffect, onCleanup, onMount} from 'solid-js'
 import {useSettings} from '~/config/settings-context.tsx'
 import {FileSystem} from '~/lib/file-system'
@@ -7,10 +7,7 @@ import * as styles from './background.css.ts'
 const Background: Component = () => {
   const [settings, {setBackground}] = useSettings()
   const runtime = ManagedRuntime.make(
-    Layer.effect(
-      FileSystem.FileSystem,
-      FileSystem.make(Effect.promise(() => navigator.storage.getDirectory())),
-    ),
+    FileSystem.make(Effect.promise(() => navigator.storage.getDirectory())),
   )
 
   onMount(() => {

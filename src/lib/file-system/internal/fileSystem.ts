@@ -1,14 +1,22 @@
-import {Effect} from 'effect'
-import {getDirectoryHandle, getFileHandle, opfsFile} from './opfs.ts'
+import {Context, Effect, pipe} from 'effect'
+import * as opfs from './opfs.ts'
 
-export const makeDirectory =
-  (root: FileSystemDirectoryHandle) => (path: string) =>
-    getDirectoryHandle(path, {create: true})(root)
+export type RootDirectory = FileSystemDirectoryHandle
 
-export const getFileFactory =
-  (root: FileSystemDirectoryHandle) => (path: string) =>
-    Effect.flatMap(getFileHandle(path, {create: true})(root), opfsFile.getFile)
+export const RootDirectory =
+  Context.GenericTag<RootDirectory>('@file-system/root')
 
-export const writeFileFactory =
-  (root: FileSystemDirectoryHandle) => (path: string, file: File) =>
-    Effect.flatMap(getFileHandle(path)(root), opfsFile.writeFile(file))
+export const makeDirectory = (path: string) =>
+  Effect.flatMap(RootDirectory, opfs.getDirectoryHandle(path, {create: true}))
+
+export const writeFile = (path: string, file: File) =>
+  pipe(
+    Effect.flatMap(RootDirectory, opfs.getFileHandle(path)),
+    Effect.flatMap(opfs.writeFile(file)),
+  )
+
+export const getFile = (path: string) =>
+  pipe(
+    Effect.flatMap(RootDirectory, opfs.getFileHandle(path, {create: true})),
+    Effect.flatMap(opfs.getFile),
+  )

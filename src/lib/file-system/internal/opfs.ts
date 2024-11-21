@@ -24,14 +24,12 @@ export const getFileHandle =
     )
   }
 
-export const opfsFile = {
-  getFile: (file: FileSystemFileHandle) =>
-    Effect.promise(() => file.getFile()),
+export const getFile = (file: FileSystemFileHandle) =>
+  Effect.promise(() => file.getFile())
 
-  writeFile: (file: File) => (handle: FileSystemFileHandle) =>
-    pipe(
-      Effect.promise(() => handle.createWritable()),
-      Effect.tap((w) => Effect.promise(() => w.write(file))),
-      Effect.flatMap((w) => Effect.promise(() => w.close())),
-    ),
-}
+export const writeFile = (file: File) => (handle: FileSystemFileHandle) =>
+  pipe(
+    Effect.promise(() => handle.createWritable()),
+    Effect.tap((w) => Effect.promise(() => w.write(file))),
+    Effect.flatMap((w) => Effect.promise(() => w.close())),
+  )

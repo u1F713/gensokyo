@@ -1,1 +1,1 @@
-export * as FileSystem from './FileSystem.ts'
+export * as FileSystem from './FileSystemAPI.ts'
