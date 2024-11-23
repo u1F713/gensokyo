@@ -12,7 +12,7 @@ interface FileSystem {
    */
   readonly makeDirectory: (
     path: string,
-  ) => Effect.Effect<void, never, RootDirectory>
+  ) => Effect.Effect<FileSystemDirectoryHandle, never, RootDirectory>
   /**
    * Write data to a file at `path`.
    */
